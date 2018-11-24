@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Watch It!</string>
+    <string name="action_sort_by_date">Sort by date</string>
+    <string name="action_sort_by_popularity">Sort by popularity</string>
+    <string name="action_sort_by_rating">Sort by rating</string>
+    <string name="action_sort_by_name">Sort by name</string>
+</resources>
