@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TmdbUtils {
+public final class TmdbUtils {
 
     static final String TAG = "TmdbUtils";
 

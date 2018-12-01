@@ -29,14 +29,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AsyncResponse {
 
-    static public String TAG = "MainActivity";
+    static private String TAG = "MainActivity";
     static private final String API_KEY = "YOUR_API_KEY";
-    RetrieveMoviesTask moviesTask;
-    MovieAdapter mAdapter;
-    List<Movie> mMovies = new ArrayList<>();
 
-    GridView gridView;
-    ProgressBar progress;
+    private RetrieveMoviesTask moviesTask;
+    private MovieAdapter mAdapter;
+    private List<Movie> mMovies = new ArrayList<>();
+
+    private GridView gridView;
+    private ProgressBar progress;
 
     private MenuItem mQueryNowPlaying;
     private MenuItem mQueryPopular;
@@ -62,9 +63,7 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
         progress.setVisibility(View.VISIBLE);
 
         mQueryMode = QueryMode.MOVIES_NOW_PLAYING;
-
         SetupNewMoviesTask();
-
         moviesTask.execute(mQueryMode);
     }
 
