@@ -27,6 +27,7 @@ public class MovieDetailView extends AppCompatActivity {
                 .error(R.drawable.error_poster)
                 .into((ImageView)findViewById(R.id.movie_detail_poster));
         ((TextView) findViewById(R.id.movie_detail_year)).setText(String.valueOf(mMovie.getReleaseDate().getYear()+1900));
+        ((TextView) findViewById(R.id.movie_detail_runtime)).setText(String.valueOf(mMovie.getRuntime()) + " minutes");
         ((TextView) findViewById(R.id.movie_detail_rating)).setText(String.valueOf(mMovie.getRating()) + "/10");
         ((TextView) findViewById(R.id.movie_detail_overview)).setText(mMovie.getOverview());
     }

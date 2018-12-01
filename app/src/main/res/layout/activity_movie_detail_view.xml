@@ -24,9 +24,28 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <LinearLayout
+                android:id="@+id/movie_detail_date"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/movie_detail_year"
+                    android:textSize="48sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/movie_detail_month_day"
+                    android:textSize="24sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
             <TextView
-                android:id="@+id/movie_detail_year"
-                android:textSize="48sp"
+                android:id="@+id/movie_detail_runtime"
+                android:textSize="24sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

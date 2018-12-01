@@ -5,7 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.persistentdevelopment.watchit.utilities.NetworkUtils;
-import com.persistentdevelopment.watchit.utilities.TmbdUtils.PosterSizes;
+import com.persistentdevelopment.watchit.utilities.TmdbUtils.PosterSizes;
 
 import java.net.URL;
 import java.util.Comparator;
@@ -17,6 +17,7 @@ public class Movie implements Comparable<Movie>, Parcelable {
     private String Title;
     private double Popularity;
     private double Rating;
+    private int Runtime;
     private String Overview;
     private Date ReleaseDate;
     private String PosterPath;
@@ -28,6 +29,7 @@ public class Movie implements Comparable<Movie>, Parcelable {
         Title = in.readString();
         Popularity = in.readDouble();
         Rating = in.readDouble();
+        Runtime = in.readInt();
         Overview = in.readString();
         ReleaseDate = new Date(Date.parse(in.readString()));
         PosterPath = in.readString();
@@ -57,6 +59,9 @@ public class Movie implements Comparable<Movie>, Parcelable {
     public double getRating() { return Rating; }
     public void setRating(double value) { Rating = value; }
 
+    public int getRuntime() { return Runtime; }
+    public void setRuntime(int value) { Runtime = value; }
+
     public String getOverview() { return Overview; }
     public void setOverview(String value) { Overview = value; }
 
@@ -72,7 +77,7 @@ public class Movie implements Comparable<Movie>, Parcelable {
     public String getPosterPath() {
         String scheme = "http";
         String authority = "image.tmdb.org";
-        String[] paths = new String[]{"t", "p", PosterSizes.W185, PosterPath};
+        String paths = String.format("t/p/%s/%s", PosterSizes.W185, PosterPath);
 
         URL url = NetworkUtils.buildUrl(scheme, authority, paths, null);
         if (url == null) return null;
@@ -151,6 +156,7 @@ public class Movie implements Comparable<Movie>, Parcelable {
         parcel.writeString(Title);
         parcel.writeDouble(Popularity);
         parcel.writeDouble(Rating);
+        parcel.writeInt(Runtime);
         parcel.writeString(Overview);
         parcel.writeString(ReleaseDate.toString());
         parcel.writeString(PosterPath);

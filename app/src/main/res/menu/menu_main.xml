@@ -5,29 +5,36 @@
     <item
         android:visible="true"
         android:enabled="true"
-        android:id="@+id/action_sort_by_date"
+        android:id="@+id/action_query_movies_now_playing"
         android:orderInCategory="100"
-        android:title="@string/action_sort_by_date"
+        android:title="@string/action_query_movies_now_playing"
         app:showAsAction="never" />
     <item
         android:visible="true"
         android:enabled="true"
-        android:id="@+id/action_sort_by_popularity"
+        android:id="@+id/action_query_movies_popular"
         android:orderInCategory="100"
-        android:title="@string/action_sort_by_popularity"
+        android:title="@string/action_query_movies_popular"
         app:showAsAction="never" />
     <item
         android:visible="true"
         android:enabled="true"
-        android:id="@+id/action_sort_by_rating"
+        android:id="@+id/action_query_movies_top_rated"
         android:orderInCategory="100"
-        android:title="@string/action_sort_by_rating"
+        android:title="@string/action_query_movies_top_rated"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_query_movies_upcoming"
+        android:enabled="true"
+        android:orderInCategory="100"
+        android:title="@string/action_query_movies_upcoming"
+        android:visible="true"
         app:showAsAction="never" />
     <item
         android:visible="true"
         android:enabled="true"
-        android:id="@+id/action_sort_by_name"
+        android:id="@+id/action_query_discover"
         android:orderInCategory="100"
-        android:title="@string/action_sort_by_name"
+        android:title="@string/action_query_discover"
         app:showAsAction="never" />
 </menu>

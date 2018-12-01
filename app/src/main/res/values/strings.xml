@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Watch It!</string>
-    <string name="action_sort_by_date">Sort by date</string>
-    <string name="action_sort_by_popularity">Sort by popularity</string>
-    <string name="action_sort_by_rating">Sort by rating</string>
-    <string name="action_sort_by_name">Sort by name</string>
+    <string name="action_query_movies_now_playing">Now Playing</string>
+    <string name="action_query_movies_popular">Popular</string>
+    <string name="action_query_movies_top_rated">Top Rated</string>
+    <string name="action_query_movies_upcoming">Upcoming</string>
+    <string name="action_query_discover">Discover</string>
 </resources>

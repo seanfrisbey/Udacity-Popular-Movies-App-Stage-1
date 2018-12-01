@@ -10,18 +10,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.persistentdevelopment.watchit.R;
 import com.persistentdevelopment.watchit.adapters.MovieAdapter;
 import com.persistentdevelopment.watchit.objects.Movie;
 import com.persistentdevelopment.watchit.interfaces.AsyncResponse;
+import com.persistentdevelopment.watchit.utilities.TmdbUtils;
+import com.persistentdevelopment.watchit.utilities.TmdbUtils.QueryMode;
 import com.persistentdevelopment.watchit.utilities.NetworkUtils;
-import com.persistentdevelopment.watchit.utilities.TmbdUtils;
 
 import org.json.JSONException;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -29,22 +30,20 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements AsyncResponse {
 
     static public String TAG = "MainActivity";
-    static private final String API_KEY = "YOUR_KEY_HERE";
-    RetrieveMoviesTask moviesTask = new RetrieveMoviesTask();
+    static private final String API_KEY = "YOUR_API_KEY";
+    RetrieveMoviesTask moviesTask;
     MovieAdapter mAdapter;
+    List<Movie> mMovies = new ArrayList<>();
 
     GridView gridView;
     ProgressBar progress;
 
-    enum SortMode {
-        DATE, POPULARITY, RATING, NAME,
-    }
-
-    private MenuItem mSortByDate;
-    private MenuItem mSortByPopularity;
-    private MenuItem mSortByRating;
-    private MenuItem mSortByName;
-    private SortMode mSortMode;
+    private MenuItem mQueryNowPlaying;
+    private MenuItem mQueryPopular;
+    private MenuItem mQueryTopRated;
+    private MenuItem mQueryUpcoming;
+    private MenuItem mQueryDiscover;
+    private QueryMode mQueryMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,20 +55,31 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
 
         gridView = findViewById(R.id.movie_grid);
         gridView.setVisibility(View.INVISIBLE);
+        mAdapter = new MovieAdapter(this, mMovies);
+        gridView.setAdapter(mAdapter);
 
         progress = findViewById(R.id.loader_progress);
         progress.setVisibility(View.VISIBLE);
 
+        mQueryMode = QueryMode.MOVIES_NOW_PLAYING;
+
+        SetupNewMoviesTask();
+
+        moviesTask.execute(mQueryMode);
+    }
+
+    protected void SetupNewMoviesTask() {
+        moviesTask = new RetrieveMoviesTask();
         moviesTask.delegate = this;
-        moviesTask.execute();
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        mSortByDate.setEnabled(mSortMode != SortMode.DATE);
-        mSortByPopularity.setEnabled(mSortMode != SortMode.POPULARITY);
-        mSortByRating.setEnabled(mSortMode != SortMode.RATING);
-        mSortByName.setEnabled(mSortMode != SortMode.NAME);
+        mQueryNowPlaying.setEnabled(mQueryMode != QueryMode.MOVIES_NOW_PLAYING);
+        mQueryPopular.setEnabled(mQueryMode != QueryMode.MOVIES_POPULAR);
+        mQueryTopRated.setEnabled(mQueryMode != QueryMode.MOVIES_TOP_RATED);
+        mQueryUpcoming.setEnabled(mQueryMode != QueryMode.MOVIES_UPCOMING);
+        mQueryDiscover.setEnabled(mQueryMode != QueryMode.DISCOVER);
 
         return true;
     }
@@ -78,97 +88,113 @@ public class MainActivity extends AppCompatActivity implements AsyncResponse {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        mSortByDate = menu.findItem(R.id.action_sort_by_date);
-        mSortByPopularity = menu.findItem(R.id.action_sort_by_popularity);
-        mSortByRating = menu.findItem(R.id.action_sort_by_rating);
-        mSortByName = menu.findItem(R.id.action_sort_by_name);
+        mQueryNowPlaying = menu.findItem(R.id.action_query_movies_now_playing);
+        mQueryPopular = menu.findItem(R.id.action_query_movies_popular);
+        mQueryTopRated = menu.findItem(R.id.action_query_movies_top_rated);
+        mQueryUpcoming = menu.findItem(R.id.action_query_movies_upcoming);
+        mQueryDiscover = menu.findItem(R.id.action_query_discover);
 
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        moviesTask.cancel(true);
+
+        while (!moviesTask.isCancelled()) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         int id = item.getItemId();
 
+        progress.setVisibility(View.VISIBLE);
+        gridView.setVisibility(View.INVISIBLE);
+
         switch (id) {
-            case R.id.action_sort_by_date:
-                SetSortMode(SortMode.DATE);
-                return true;
-            case R.id.action_sort_by_popularity:
-                SetSortMode(SortMode.POPULARITY);
-                return true;
-            case R.id.action_sort_by_rating:
-                SetSortMode(SortMode.RATING);
-                return true;
-            case R.id.action_sort_by_name:
-                SetSortMode(SortMode.NAME);
-                return true;
+            case R.id.action_query_movies_now_playing:
+                mQueryMode = QueryMode.MOVIES_NOW_PLAYING;
+                break;
+            case R.id.action_query_movies_popular:
+                mQueryMode = QueryMode.MOVIES_POPULAR;
+                break;
+            case R.id.action_query_movies_top_rated:
+                mQueryMode = QueryMode.MOVIES_TOP_RATED;
+                break;
+            case R.id.action_query_movies_upcoming:
+                mQueryMode = QueryMode.MOVIES_UPCOMING;
+                break;
+            case R.id.action_query_discover:
+                mQueryMode = QueryMode.DISCOVER;
+                break;
             default:
                 return false;
         }
+
+        SetupNewMoviesTask();
+        moviesTask.execute(mQueryMode);
+
+        return true;
     }
 
     @Override
     public void processFinish(Movie[] movies) {
-        mAdapter = new MovieAdapter(this);
-        mAdapter.updateData(Arrays.asList(movies));
-        SetSortMode(SortMode.DATE);
-        gridView.setAdapter(mAdapter);
+        mMovies.clear();
+        mMovies.addAll(Arrays.asList(movies));
+        mAdapter.notifyDataSetChanged();
 
         progress.setVisibility(View.INVISIBLE);
         gridView.setVisibility(View.VISIBLE);
     }
 
-    void SetSortMode(SortMode sortMode){
-        mSortMode = sortMode;
-        if (mAdapter == null) return;
-        List<Movie> movies = mAdapter.GetMovies();
-
-        switch (mSortMode)
-        {
-            case DATE:
-                movies.sort(Movie.MovieDateComparator);
-                break;
-            case POPULARITY:
-                movies.sort(Movie.MoviePopularityComparator);
-                break;
-            case RATING:
-                movies.sort(Movie.MovieRatingComparator);
-                break;
-            case NAME:
-                movies.sort(Movie.MovieTitleComparator);
-                break;
-        }
-
-        mAdapter.updateData(movies);
-        Toast.makeText(this, "Sorting by " + mSortMode.name()
-                .toLowerCase(), Toast.LENGTH_LONG).show();
-    }
-
-    static class RetrieveMoviesTask extends AsyncTask<Void, Void, Movie[]>{
+    static class RetrieveMoviesTask extends AsyncTask<QueryMode, Void, Movie[]>{
         String TAG = "MovieTask";
         AsyncResponse delegate = null;
 
         @Override
-        protected Movie[] doInBackground(Void... voids) {
+        protected Movie[] doInBackground(QueryMode... queryModes) {
+            Movie[] movies = new Movie[]{};
+            QueryMode queryMode = queryModes[0];
+
             String scheme = "https";
             String authority = "api.themoviedb.org";
-            String[] paths = new String[]{"3", "discover", "movie"};
-            Hashtable<String, String> params = new Hashtable<String, String>(){{
-                put("api_key", API_KEY);
-                put("language", "en-US");
-                put("include_adult", "false");
-            }};
+            String paths = "";
+            Hashtable<String, String> params = new Hashtable<String, String>(){{}};
+
+            switch (queryMode)
+            {
+                case DISCOVER:
+                    paths = "3/discover/movie";
+                    break;
+                case MOVIES_NOW_PLAYING:
+                    paths = "3/movie/now_playing";
+                    break;
+                case MOVIES_POPULAR:
+                    paths = "3/movie/popular";
+                    break;
+                case MOVIES_TOP_RATED:
+                    paths = "3/movie/top_rated";
+                    break;
+                case MOVIES_UPCOMING:
+                    paths = "3/movie/upcoming";
+                    break;
+                default:
+                    break;
+            }
+
+            params.put("api_key", API_KEY);
 
             URL url = NetworkUtils.buildUrl(scheme, authority, paths, params);
-            if (url == null) return null;
+            if (url == null) return movies;
 
             String json = NetworkUtils.getResponseFromHttpUrl(url);
-            if (json == null) return null;
+            if (json == null) return movies;
 
-            Movie[] movies = null;
             try {
-                movies = TmbdUtils.getMoviesFromJson(json);
+                movies = TmdbUtils.getMoviesFromJson(json, queryMode);
             } catch (JSONException e) {
                 Log.e(TAG, e.getMessage());
             }

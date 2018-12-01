@@ -14,14 +14,15 @@ import java.util.Scanner;
 public class NetworkUtils {
     static String TAG = "NetworkUtils";
 
-    public static URL buildUrl(String scheme, String authority, String[] paths, Map<String, String> params) {
+    public static URL buildUrl(String scheme, String authority, String path, Map<String, String> params) {
 
         Uri.Builder builder = new Uri.Builder()
                 .scheme(scheme)
                 .authority(authority);
 
-        for (String path : paths) {
-            builder.appendPath(path);
+        String[] segments = path.split("/");
+        for (String segment : segments) {
+            builder.appendPath(segment);
         }
 
         if (params != null)

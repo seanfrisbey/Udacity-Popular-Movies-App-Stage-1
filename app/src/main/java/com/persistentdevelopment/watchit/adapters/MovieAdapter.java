@@ -2,9 +2,6 @@ package com.persistentdevelopment.watchit.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,13 +18,12 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class MovieAdapter extends ArrayAdapter<Movie> {
-    private Context mContext;
     private LayoutInflater mInflater;
     private List<Movie> mMovies;
 
-    public MovieAdapter(Context context) {
-        super(context, 0);
-        mContext = context;
+    public MovieAdapter(Context context, List<Movie> movies) {
+        super(context, 0, movies);
+        mMovies = movies;
         mInflater = LayoutInflater.from(context);
     }
 
@@ -55,9 +51,9 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
         posterView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, MovieDetailView.class);
+                Intent intent = new Intent(getContext(), MovieDetailView.class);
                 intent.putExtra("movie", movie);
-                mContext.startActivity(intent);
+                getContext().startActivity(intent);
             }
         });
         Picasso.get()
@@ -67,11 +63,6 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
                 .into(posterView);
 
         return convertView;
-    }
-
-    public void updateData(List<Movie> newMovies) {
-        mMovies = newMovies;
-        notifyDataSetChanged();
     }
 
     public List<Movie> GetMovies() { return mMovies; }
